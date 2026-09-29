@@ -12,7 +12,7 @@ const tintFor = (category: string) =>
 
 export function ProductCard({ product }: { product: Product }) {
   const { qtyOf, add, setQty, wishlist, toggleWishlist, openDetail } = useStore();
-  const [variant, setVariant] = useState(product.variants[0]);
+  const [variant, setVariant] = useState(product.variants[0]!);
   const qty = qtyOf(product.id);
   const { price, mrp } = variantPrice(product, variant);
   const off = discount(product);

@@ -43,7 +43,7 @@ export function HeroCarousel() {
     return () => clearInterval(t);
   }, []);
 
-  const s = slides[i];
+  const s = slides[i]!;
 
   return (
     <section

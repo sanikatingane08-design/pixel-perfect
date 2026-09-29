@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 type Sort = "relevance" | "price" | "discount" | "rating";
 
 export const Route = createFileRoute("/search")({
-  validateSearch: (search: Record<string, unknown>) => ({ q: (search.q as string) ?? "" }),
+  validateSearch: (search: Record<string, unknown>) => ({ q: (search['q'] as string) ?? "" }),
   head: () => ({
     meta: [
       { title: "Search groceries — FreshNest" },

@@ -59,7 +59,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const add = useCallback((p: Product, variant?: string) => {
     setLines((prev) => {
-      const v = variant ?? p.variants[0];
+      const v = variant ?? p.variants[0]!;
       const found = prev.find((l) => l.id === p.id);
       if (found) return prev.map((l) => (l.id === p.id ? { ...l, qty: l.qty + 1, variant: v } : l));
       return [...prev, { id: p.id, qty: 1, variant: v }];

@@ -28,13 +28,12 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    if (count > prev.current) {
-      setBounce(true);
-      const t = setTimeout(() => setBounce(false), 520);
-      prev.current = count;
-      return () => clearTimeout(t);
-    }
+    const grew = count > prev.current;
     prev.current = count;
+    if (!grew) return undefined;
+    setBounce(true);
+    const t = setTimeout(() => setBounce(false), 520);
+    return () => clearTimeout(t);
   }, [count]);
 
   const submit = (e: React.FormEvent) => {
