@@ -110,6 +110,7 @@ export function Header() {
           <button
             type="button"
             onClick={openCart}
+            aria-label="Open cart"
             className={`flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-bold text-primary-foreground shadow-glow ${
               bounce ? "animate-cart-bounce" : ""
             }`}
