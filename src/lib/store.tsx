@@ -1,32 +1,16 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { products, type Product } from "@/data/catalog";
+import {
+  StoreContext,
+  fallbackStore,
+  type CartLine,
+  type StoreValue,
+} from "@/lib/store-context";
 
-export type CartLine = { id: string; qty: number; variant: string };
-
-type StoreValue = {
-  lines: CartLine[];
-  wishlist: string[];
-  cartOpen: boolean;
-  count: number;
-  subtotal: number;
-  savings: number;
-  qtyOf: (id: string) => number;
-  add: (p: Product, variant?: string) => void;
-  remove: (id: string) => void;
-  setQty: (id: string, qty: number) => void;
-  clear: () => void;
-  toggleWishlist: (id: string) => void;
-  openCart: () => void;
-  closeCart: () => void;
-  detailProduct: Product | null;
-  openDetail: (p: Product) => void;
-  closeDetail: () => void;
-};
+export type { CartLine, StoreValue };
 
 const KEY = "freshnest.cart.v1";
 const WKEY = "freshnest.wishlist.v1";
-
-const StoreContext = createContext<StoreValue | null>(null);
 
 const priceFor = (p: Product, variant: string) => {
   const i = Math.max(0, p.variants.indexOf(variant));
@@ -77,11 +61,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<StoreValue>(() => {
-    const priced = lines.map((l) => {
-      const p = products.find((x) => x.id === l.id)!;
-      const { price, mrp } = priceFor(p, l.variant);
-      return { line: l, price, mrp };
-    });
+    const priced = lines
+      .map((l) => {
+        const p = products.find((x) => x.id === l.id);
+        if (!p) return null;
+        const { price, mrp } = priceFor(p, l.variant);
+        return { line: l, price, mrp };
+      })
+      .filter((x): x is { line: CartLine; price: number; mrp: number } => x !== null);
+
     return {
       lines,
       wishlist,
@@ -107,9 +95,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
 
-export function useStore() {
+export function useStore(): StoreValue {
   const ctx = useContext(StoreContext);
-  if (!ctx) throw new Error("useStore must be used inside StoreProvider");
+  if (!ctx) {
+    if (import.meta.env.DEV) {
+      console.warn("useStore used outside StoreProvider; falling back to an inert store.");
+    }
+    return fallbackStore;
+  }
   return ctx;
 }
 
